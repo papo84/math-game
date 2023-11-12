@@ -15,6 +15,8 @@ function generateRandom() {
     document.getElementById('number2').value = number2;
     document.getElementById('operation').value = operation;
     document.getElementById('exercise').value =  '? = ' + number2 + ' ' + convertToSymbol(operation) + ' ' + number1;
+    // Focus on the "Result" input field
+    document.getElementById('result').focus();
   }
 
   function clearResultColor() {
@@ -77,8 +79,6 @@ function generateRandom() {
     if (event.key === 'Shift') {
       // Trigger the "Random" button click
       document.getElementById('random').click();
-      // Focus on the "Result" input field
-      document.getElementById('result').focus();
     }
   });
   
