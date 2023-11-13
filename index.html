@@ -12,87 +12,93 @@
   <div class="banner">
     <h1>משחקי החשבון</h1>
   </div>
-  <div class="description">
-    <p>
-      ברוכים הבאים למשחקי החשבון! להתחלה, בחרו את הפעולות שתרצו להגריל מהם ואת מספר הספרות, לחצו הגרל, רישמו את הפתרון ותלחצו על בדיקה.
-      <br>
-      למשתמשי המחשב, יכולים ללחוץ על Shift בשביל להגריל תרגיל חדש וEnter בשביל לבדוק את הפתרון.
-    </p>
-  </div>
-  <div class="container">
-    <div class="innerContainer">
-      <div class="top-section">
-        <div class="input-group-input">
-          <label for="number1">מספר 1</label>
-          <input type="text" id="number1" readonly>
+  <div>
+    <div class="description">
+      <p>
+        ברוכים הבאים למשחקי החשבון!
+        <br>
+        בחרו את הפעולות שתרצו להגריל מהם ואת מספר הספרות, לחצו הגרל, רישמו את הפתרון
+        ולחצו על בדיקה.
+        <br>
+        למשתמשי המחשב, יכולים ללחוץ על Shift בשביל להגריל תרגיל חדש וEnter בשביל לבדוק את הפתרון.
+      </p>
+    </div>
+    <div class="container">
+      <div class="innerContainer">
+        <div class="top-section">
+          <div class="input-group-input">
+            <label for="number1">מספר 1</label>
+            <input type="text" id="number1" readonly>
+          </div>
+
+          <div class="input-group-input">
+            <label for="number2">מספר 2</label>
+            <input type="text" id="number2" readonly>
+          </div>
+
+          <div class="input-group-input">
+            <label for="operation">פעולה</label>
+            <input type="text" id="operation" readonly>
+          </div>
+        </div>
+        <div>
+          <div class="input-group-input">
+            <label for="exercise">תרגיל</label>
+            <input type="text" id="exercise" readonly>
+          </div>
+        </div>
+        <label for="arithmetics">חשבון</label>
+        <div id="arithmetics" class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="add" value="חיבור" checked>
+            <label for="add">חיבור</label>
+          </div>
+
+          <div class="checkbox-item">
+            <input type="checkbox" id="subtract" value="חיסור">
+            <label for="subtract">חיסור</label>
+          </div>
+
+          <div class="checkbox-item">
+            <input type="checkbox" id="multiply" value="כפל">
+            <label for="multiply">כפל</label>
+          </div>
+
+          <div class="checkbox-item">
+            <input type="checkbox" id="divide" value="חילוק">
+            <label for="divide">חילוק</label>
+          </div>
+
+          <div class="checkbox-item">
+            <input type="checkbox" id="power" value="חזקה">
+            <label for="power">חזקה</label>
+          </div>
+        </div>
+        <div class="bottom-section">
+          <div class="input-group">
+            <label id="digitsLabel" for="digits">ספרות</label>
+            <input type="number" id="digits" min="1" max="5" value="1">
+          </div>
         </div>
 
-        <div class="input-group-input">
-          <label for="number2">מספר 2</label>
-          <input type="text" id="number2" readonly>
-        </div>
+        <button id="random" onclick="generateRandom()">הגרל</button>
 
-        <div class="input-group-input">
-          <label for="operation">פעולה</label>
-          <input type="text" id="operation" readonly>
-        </div>
-      </div>
-      <div>
-        <div class="input-group-input">
-          <label for="exercise">תרגיל</label>
-          <input type="text" id="exercise" readonly>
-        </div>
-      </div>
-      <label for="arithmetics">חשבון</label>
-      <div id="arithmetics" class="checkbox-group">
-        <div class="checkbox-item">
-          <input type="checkbox" id="add" value="חיבור" checked>
-          <label for="add">חיבור</label>
-        </div>
+        <hr class="divider">
 
-        <div class="checkbox-item">
-          <input type="checkbox" id="subtract" value="חיסור">
-          <label for="subtract">חיסור</label>
+        <div class="bttoom-section">
+          <div class="input-group">
+            <label id="resultLabel" for="result">תוצאה</label>
+            <input type="text" id="result" value="">
+            <button id="check" onclick="checkResult()">בדיקה</button>
+          </div>
+
         </div>
-
-        <div class="checkbox-item">
-          <input type="checkbox" id="multiply" value="כפל">
-          <label for="multiply">כפל</label>
-        </div>
-
-        <div class="checkbox-item">
-          <input type="checkbox" id="divide" value="חילוק">
-          <label for="divide">חילוק</label>
-        </div>
-
-        <div class="checkbox-item">
-          <input type="checkbox" id="power" value="חזקה">
-          <label for="power">חזקה</label>
-        </div>
-      </div>
-      <div class="bottom-section">
-        <div class="input-group">
-          <label id="digitsLabel" for="digits">ספרות</label>
-          <input type="number" id="digits" min="1" max="5" value="1">
-        </div>
-      </div>
-
-      <button id="random" onclick="generateRandom()">הגרל</button>
-
-      <hr class="divider">
-
-      <div class="bttoom-section">
-        <div class="input-group">
-          <label id="resultLabel" for="result">תוצאה</label>
-          <input type="text" id="result" value="">
-          <button id="check" onclick="checkResult()">בדיקה</button>
-        </div>
-
       </div>
     </div>
   </div>
-
+  <canvas id="confettiCanvas"></canvas>
   <script src="app.js"></script>
+  <script src="confetti.js"></script>
 </body>
 
 </html>

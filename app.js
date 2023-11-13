@@ -61,11 +61,26 @@ function generateRandom() {
     }
   
     if (result === calculatedResult) {
-      resultInput.style.backgroundColor = 'lightgreen';
+      resultInput.style.backgroundColor = 'lightgreen';  // Assuming the result is correct, trigger confetti
+      startConfetti();
+      setTimeout(function(){stopConfetti();},2000)
     } else {
       resultInput.style.backgroundColor = '#FFCCCB';
     }
   }
+
+  function triggerConfetti() {
+    // Configure confetti options
+    const confettiConfig = {
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+    };
+  
+    // Trigger confetti
+    confetti(confettiConfig);
+  }
+
   // Add an event listener for the "Enter" key on the entire document
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
