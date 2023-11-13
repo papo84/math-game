@@ -1,15 +1,20 @@
 function generateRandom() {
     clearResultColor(); // Clear color before generating new values
-
-    const number1 = generateRandomNumber(document.getElementById('digits').value);
-    const number2 = generateRandomNumber(document.getElementById('digits').value);
   
     // Get selected checkboxes for arithmetics
     const arithmeticsCheckboxes = document.querySelectorAll('#arithmetics input[type="checkbox"]:checked');
     const selectedArithmetics = Array.from(arithmeticsCheckboxes).map(checkbox => checkbox.value);
   
+    // Return error if no operation selected
+    if(selectedArithmetics.length == 0) {
+      alert('בחר פעולה');
+      return;
+    }
     // Get a random arithmetic operation from the selected values
     const operation = selectedArithmetics[Math.floor(Math.random() * selectedArithmetics.length)];
+
+    const number1 = generateRandomNumber(document.getElementById('digits').value);
+    const number2 = generateRandomNumber(document.getElementById('digits').value);
   
     document.getElementById('number1').value = number1;
     document.getElementById('number2').value = number2;
@@ -25,7 +30,7 @@ function generateRandom() {
     document.getElementById('result').value = '';
   }
   
-  function generateRandomNumber(digits) {
+  function generateRandomNumber(digits, operation) {
     const min = Math.pow(10, digits - 1);
     const max = Math.pow(10, digits) - 1;
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -103,6 +108,12 @@ function generateRandom() {
     // Add an input event listener to the digits input field
     digitsInput.addEventListener('input', function() {
       enforceValidDigits(digitsInput);
+    });
+    const resultInput = document.getElementById('result');
+  
+    // Add an input event listener to the result input field
+    resultInput.addEventListener('input', function() {
+      document.getElementById('result').style.backgroundColor = '';
     });
   });
   
