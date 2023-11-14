@@ -67,8 +67,8 @@ function generateRandom() {
   
     if (result === calculatedResult) {
       resultInput.style.backgroundColor = 'lightgreen';  // Assuming the result is correct, trigger confetti
-      startConfetti();
-      setTimeout(function(){stopConfetti();},2000)
+      startStars();
+      setTimeout(function(){stopStars();},2000)
     } else {
       resultInput.style.backgroundColor = '#FFCCCB';
     }
