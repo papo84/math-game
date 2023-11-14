@@ -21,14 +21,10 @@ var removeStars;
         particle.color = colors[(Math.random() * colors.length) | 0];
         particle.x = Math.random() * width;
         particle.y = Math.random() * height - height;
-        
-        // Adjust the following line to set a larger range of initial diameters
-        particle.diameter = Math.random() * 20 + 10; // Change the numbers as needed
-    
+        particle.diameter = Math.random() * 10 + 5;
         particle.tilt = Math.random() * 10 - 10;
         particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
         particle.tiltAngle = 0;
-    
         return particle;
     }
     
