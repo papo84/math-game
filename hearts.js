@@ -1,18 +1,18 @@
 var maxParticleCount = 250;
 var particleSpeed = 1;
-var startStars;
-var stopStars;
-var toggleStars;
-var removeStars;
+var startHearts;
+var stopHearts;
+var toggleHearts;
+var removeHearts;
 
 (function() {
-    startStars = startStarsInner;
-    stopStars = stopStarsInner;
-    toggleStars = toggleStarsInner;
-    removeStars = removeStarsInner;
+    startHearts = startHeartsInner;
+    stopHearts = stopHeartsInner;
+    toggleHearts = toggleHeartsInner;
+    removeHearts = removeHeartsInner;
 
     var colors = ["DodgerBlue", "OliveDrab", "Gold", "Pink", "SlateBlue", "LightBlue", "Violet", "PaleGreen", "SteelBlue", "SandyBrown", "Chocolate", "Crimson"];
-    var streamingStars = false;
+    var streamingHearts = false;
     var animationTimer = null;
     var particles = [];
     var waveAngle = 0;
@@ -21,15 +21,15 @@ var removeStars;
         particle.color = colors[(Math.random() * colors.length) | 0];
         particle.x = Math.random() * width;
         particle.y = Math.random() * height - height;
-        particle.diameter = Math.random() * 10 + 5;
-        particle.tilt = Math.random() * 10 - 10;
+        particle.diameter = Math.random() * 25 + 5;
+        particle.tilt = Math.random() * 15 - 10;
         particle.tiltAngleIncrement = Math.random() * 0.07 + 0.05;
         particle.tiltAngle = 0;
         return particle;
     }
     
 
-    function startStarsInner() {
+    function startHeartsInner() {
         var width = window.innerWidth;
         var height = window.innerHeight;
 
@@ -49,7 +49,7 @@ var removeStars;
         while (particles.length < maxParticleCount)
             particles.push(resetParticle({}, width, height));
 
-        streamingStars = true;
+        streamingHearts = true;
 
         if (animationTimer === null) {
             (function runAnimation() {
@@ -66,25 +66,24 @@ var removeStars;
         }
     }
 
-    function stopStarsInner() {
-        streamingStars = false;
+    function stopHeartsInner() {
+        streamingHearts = false;
     }
 
-    function removeStarsInner() {
-        stopStars();
+    function removeHeartsInner() {
+        stopHearts();
         particles = [];
     }
 
-    function toggleStarsInner() {
-        if (streamingStars)
-            stopStarsInner();
+    function toggleHeartsInner() {
+        if (streamingHearts)
+            stopHeartsInner();
         else
-            startStarsInner();
+            startHeartsInner();
     }
 
     function drawParticles(context) {
         var particle;
-        var x;
     
         for (var i = 0; i < particles.length; i++) {
             particle = particles[i];
@@ -93,15 +92,13 @@ var removeStars;
             context.translate(particle.x + particle.tilt, particle.y);
             context.rotate(particle.tiltAngle);
     
-            // Draw a star shape
+            // Draw a wider and bigger heart shape
             context.moveTo(0, -particle.diameter / 2);
-            context.lineTo(0, particle.diameter / 2);
-            context.moveTo(-particle.diameter / 4, -particle.diameter / 4);
-            context.lineTo(particle.diameter / 4, particle.diameter / 4);
-            context.moveTo(-particle.diameter / 4, particle.diameter / 4);
-            context.lineTo(particle.diameter / 4, -particle.diameter / 4);
-            context.moveTo(-particle.diameter / 2, 0);
-            context.lineTo(particle.diameter / 2, 0);
+            context.quadraticCurveTo(particle.diameter / 2, -particle.diameter, 0, -particle.diameter / 1.25);
+            context.quadraticCurveTo(-particle.diameter / 2, -particle.diameter, 0, -particle.diameter / 2);
+    
+            context.fillStyle = particle.color;  // Use fillStyle instead of strokeStyle
+            context.fill();  // Use fill() instead of stroke()
     
             context.lineWidth = 2;
             context.strokeStyle = particle.color;
@@ -111,10 +108,6 @@ var removeStars;
         }
     }
     
-    
-    
-    
-
     function updateParticles() {
         var width = window.innerWidth;
         var height = window.innerHeight;
@@ -124,7 +117,7 @@ var removeStars;
         for (var i = 0; i < particles.length; i++) {
             particle = particles[i];
 
-            if (!streamingStars && particle.y < -15)
+            if (!streamingHearts && particle.y < -15)
                 particle.y = height + 100;
             else {
                 particle.tiltAngle += particle.tiltAngleIncrement;
@@ -134,7 +127,7 @@ var removeStars;
             }
 
             if (particle.x > width + 20 || particle.x < -20 || particle.y > height) {
-                if (streamingStars && particles.length <= maxParticleCount)
+                if (streamingHearts && particles.length <= maxParticleCount)
                     resetParticle(particle, width, height);
                 else {
                     particles.splice(i, 1);
