@@ -149,8 +149,9 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // Load high score
-  let highScore = parseInt(getCookie('highScore'));
+  let highScore = parseInt(getCookie('highScore')) || 0;
   document.getElementById('highScore').textContent = `שיא: ${highScore}`;
+  setCookie('highScore', highScore, 365);
 });
 
 function enforceValidDigits(inputElement) {
