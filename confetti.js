@@ -1,5 +1,5 @@
-var maxParticleCount = 150;
-var particleSpeed = 2;
+var maxParticleCount = 85;
+var particleSpeed = 0.5;
 var startConfetti;
 var stopConfetti;
 var toggleConfetti;

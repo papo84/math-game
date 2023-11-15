@@ -1,5 +1,5 @@
-var maxParticleCount = 250;
-var particleSpeed = 1;
+var maxParticleCount = 85;
+var particleSpeed = 0.5;
 var startStars;
 var stopStars;
 var toggleStars;
