@@ -5,7 +5,7 @@ function generateRandom() {
   clearResultColor(); // Clear color before generating new values
 
   // Get selected checkboxes for arithmetics
-  const arithmeticsCheckboxes = document.querySelectorAll('#arithmetics input[type="checkbox"]:checked');
+  const arithmeticsCheckboxes = document.querySelectorAll('#arithmeticDropdown input[type="checkbox"]:checked');
   const selectedArithmetics = Array.from(arithmeticsCheckboxes).map(checkbox => checkbox.value);
 
   // Return error if no operation selected
@@ -22,7 +22,7 @@ function generateRandom() {
   document.getElementById('number1').value = number1;
   document.getElementById('number2').value = number2;
   document.getElementById('operation').value = operation;
-  document.getElementById('exercise').value = '? = ' + number2 + ' ' + convertToSymbol(operation) + ' ' + number1;
+  document.getElementById('exercise').value = + number1 + ' ' + convertToSymbol(operation) + ' ' + number2 + ' = ?' ;
   // Focus on the "Result" input field
   document.getElementById('result').focus();
 }
@@ -225,4 +225,87 @@ function updateScore(correct) {
   // Display the updated streak and high score
   streakElement.textContent = `רצף נוכחי: ${streak}`;
   highScoreElement.textContent = `שיא: ${highScore}`;
+}
+
+function toggleDropdown() {
+  var dropdown = document.getElementById("arithmeticDropdown");
+  dropdown.classList.toggle("show");
+
+  // Close the dropdown if it's already open
+  if (dropdown.classList.contains("show")) {
+    dropdown.style.display = 'block';
+    window.onclick = function(event) {
+      if (!event.target.matches('.dropbtn')) {
+        dropdown.classList.remove('show');
+        dropdown.style.display = 'none';
+      }
+    };
+  } else {
+    // Revert to the default behavior if the dropdown is closed
+    window.onclick = null;
+    dropdown.classList.remove('show');
+    dropdown.style.display = 'none';
+  }
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    for (var i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
+// Add the following variables to track the current mode and the correct answer
+let currentMode = 'normal'; // Default mode is 'normal'
+let correctAnswer = 0; // Variable to store the correct answer for American mode
+
+// Add the following function to toggle between modes
+function toggleMode() {
+  const modeToggle = document.getElementById('modeToggle');
+  currentMode = modeToggle.value;
+
+  // Hide/show elements based on the selected mode
+  document.getElementById('resultInput').classList.toggle('hidden', currentMode === 'american');
+  document.getElementById('resultButtons').classList.toggle('hidden', currentMode !== 'american');
+
+  // Generate a new question when toggling modes
+  generateRandom();
+}
+
+// Add the following function to check the answer in American mode
+function checkAnswer(userAnswer) {
+  // Check if the selected answer is correct
+  const resultIsCorrect = userAnswer === correctAnswer;
+
+  // Update and display the streak based on the correctness of the answer
+  updateScore(resultIsCorrect);
+
+  // Trigger confetti for correct answer
+  if (resultIsCorrect) {
+    triggerConfetti();
+  }
+
+  // Update button colors based on correctness
+  updateButtonColors(userAnswer, resultIsCorrect);
+}
+
+// Add the following function to update button colors based on correctness
+function updateButtonColors(userAnswer, resultIsCorrect) {
+  const buttons = document.getElementById('resultButtons').getElementsByTagName('button');
+
+  for (let i = 0; i < buttons.length; i++) {
+    if (i + 1 === userAnswer) {
+      // Highlight the selected button
+      buttons[i].classList.add(resultIsCorrect ? 'correct' : 'incorrect');
+    } else {
+      // Reset other buttons
+      buttons[i].classList.remove('correct', 'incorrect');
+    }
+  }
 }

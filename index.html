@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Math Game</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="icon" type="image/png" sizes="96x96" href="images/fav.ico">
 </head>
 
 <body dir="rtl">
@@ -18,9 +19,9 @@
         בחרו את הפעולות שתרצו להגריל מהם ומספר הספרות, לחצו הגרל, רישמו את הפתרון
         ולחצו על בדיקה.
         <br>
-       Shift - מגריל תרגיל חדש
-       <br>
-       Enter - בודק את הפתרון
+        Shift - מגריל תרגיל חדש
+        <br>
+        Enter - בודק את הפתרון
       </p>
       <hr class="divider">
       <div id="streak">רצף נוכחי: 0</div>
@@ -44,14 +45,48 @@
             <input type="text" id="operation" readonly>
           </div>
         </div>
+        <div class="bottom-section">
+          <div class="input-group">
+            <div class="dropdown">
+              <button onclick="toggleDropdown()" class="dropbtn">פעולות</button>
+              <div id="arithmeticDropdown" class="dropdown-content">
+                <div class="checkbox-item">
+                  <input type="checkbox" id="addCheckbox" name="addCheckbox" value="חיבור" checked>
+                  <label for="addCheckbox">חיבור</label>
+                </div>
+                <br>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="subtractCheckbox" name="subtractCheckbox" value="חיסור">
+                  <label for="subtractCheckbox">חיסור</label>
+                </div>
+                <br>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="multiplyCheckbox" name="multiplyCheckbox" value="כפל">
+                  <label for="multiplyCheckbox">כפל</label>
+                </div>
+                <br>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="divideCheckbox" name="divideCheckbox" value="חילוק">
+                  <label for="divideCheckbox">חילוק</label>
+                </div>
+                <br>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="powerCheckbox" name="powerCheckbox" value="חזקה">
+                  <label for="powerCheckbox">חזקה</label>
+                </div>
+              </div>
+            </div>
+            <label id="digitsLabel" for="digits">ספרות</label>
+            <input type="number" id="digits" min="1" max="5" value="1">
+          </div>
+        </div>
         <div>
           <div class="input-group-input">
-            <label for="exercise">תרגיל</label>
+            <button id="random" onclick="generateRandom()">הגרל</button>
             <input type="text" id="exercise" readonly>
           </div>
         </div>
-        <label for="arithmetics">חשבון</label>
-        <div id="arithmetics" class="checkbox-group">
+        <!-- <div id="arithmetics" class="checkbox-group">
           <div class="checkbox-item">
             <input type="checkbox" id="add" value="חיבור" checked>
             <label for="add">חיבור</label>
@@ -76,34 +111,38 @@
             <input type="checkbox" id="power" value="חזקה">
             <label for="power">חזקה</label>
           </div>
-        </div>
-        <div class="bottom-section">
-          <div class="input-group">
-            <label id="digitsLabel" for="digits">ספרות</label>
-            <input type="number" id="digits" min="1" max="5" value="1">
-          </div>
-        </div>
-
-        <button id="random" onclick="generateRandom()">הגרל</button>
-
+        </div> -->
         <hr class="divider">
-
         <div class="bttoom-section">
           <div class="input-group">
             <label id="resultLabel" for="result">תוצאה</label>
             <input type="text" id="result" value="">
             <button id="check" onclick="checkResult()">בדיקה</button>
           </div>
-
+          <div id="resultButtons" class="hidden">
+            <button onclick="checkAnswer(1)">Answer 1</button>
+            <button onclick="checkAnswer(2)">Answer 2</button>
+            <button onclick="checkAnswer(3)">Answer 3</button>
+            <button onclick="checkAnswer(4)">Answer 4</button>
+          </div>
+          <hr class="divider">
+          <!-- Add the following code to toggle between the modes -->
+          <div>
+            <label for="modeToggle">Mode:</label>
+            <select id="modeToggle" onchange="toggleMode()">
+              <option value="normal">רגיל</option>
+              <option value="american">אמריקאי</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
   </div>
   <canvas id="confettiCanvas"></canvas>
-  <script src="app.js"></script>
-  <script src="confetti.js"></script>
-  <script src="stars.js"></script>
-  <script src="hearts.js"></script>
+  <script src="scripts/app.js"></script>
+  <script src="scripts/confetti.js"></script>
+  <script src="scripts/stars.js"></script>
+  <script src="scripts/hearts.js"></script>
 </body>
 
 </html>
