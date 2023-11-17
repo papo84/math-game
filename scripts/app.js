@@ -46,27 +46,7 @@ function checkResult() {
   const resultInput = document.getElementById('result');
   const result = parseInt(resultInput.value, 10);
 
-  let calculatedResult;
-
-  switch (convertToSymbol(operation)) {
-    case '+':
-      calculatedResult = number1 + number2;
-      break;
-    case '-':
-      calculatedResult = number1 - number2;
-      break;
-    case '*':
-      calculatedResult = number1 * number2;
-      break;
-    case ':':
-      calculatedResult = number1 / number2;
-      break;
-    case '^':
-      calculatedResult = Math.pow(number1, number2);
-      break;
-    default:
-      calculatedResult = NaN;
-  }
+  let calculatedResult = calculateResult(number1, number2, operation);
 
   if (result === calculatedResult) {
     resultInput.style.backgroundColor = 'lightgreen';  // Assuming the result is correct, trigger confetti
@@ -104,6 +84,30 @@ function checkResult() {
       valueUpdated = true;
     }
   }
+}
+
+function calculateResult(number1, number2, operation) {
+  let calculatedResult;
+  switch (convertToSymbol(operation)) {
+    case '+':
+      calculatedResult = number1 + number2;
+      break;
+    case '-':
+      calculatedResult = number1 - number2;
+      break;
+    case '*':
+      calculatedResult = number1 * number2;
+      break;
+    case ':':
+      calculatedResult = number1 / number2;
+      break;
+    case '^':
+      calculatedResult = Math.pow(number1, number2);
+      break;
+    default:
+      calculatedResult = NaN;
+  }
+  return calculatedResult;
 }
 
 function triggerConfetti() {
@@ -273,6 +277,9 @@ function toggleMode() {
   // Hide/show elements based on the selected mode
   document.getElementById('resultInput').classList.toggle('hidden', currentMode === 'american');
   document.getElementById('resultButtons').classList.toggle('hidden', currentMode !== 'american');
+
+  document.getElementById('resultInput').classList.toggle('show', currentMode === 'normal');
+  document.getElementById('resultButtons').classList.toggle('show', currentMode !== 'normal');
 
   // Generate a new question when toggling modes
   generateRandom();

@@ -221,10 +221,20 @@ select:focus {
   display: none;
 }
 
-#resultButtons {
+.show {
   display: flex;
+}
+
+#resultButtons {
   flex-direction: column;
   justify-content: space-around;
+}
+
+.resultButton{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left:30%;
+  margin-right:30%;
 }
 
 /* Add styles for button colors */
