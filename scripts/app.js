@@ -103,8 +103,9 @@ function calculateResult(number1, number2, operation) {
 }
 
 function generateOptions(number) {
+  const negativeNumber = number < 0;
   // Extract digits from the number
-  const digits = Array.from(number.toString()).map(Number);
+  const digits = Array.from(Math.abs(number).toString()).map(Number);
 
   // Initialize options with the original number
   const options = [];
@@ -128,12 +129,15 @@ function generateOptions(number) {
   // Randomize the options and select three distinct values
   let shuffledArray = shuffleArray(options).slice(0, 3);
 
+  // If original number was negative, turn all to negative
+  if(negativeNumber) shuffledArray = shuffledArray.map(number => { return 0-number; });
+
   // Add the correct answer 
   shuffledArray.push(number);
   return shuffledArray;
 }
 
-function generateDigitOptions(digit, isFirstDigit) {
+function generateDigitOptions(digit) {
   // Define rules for each digit
   const rules = {
     0: [1, 2, 3],
@@ -145,7 +149,7 @@ function generateDigitOptions(digit, isFirstDigit) {
     6: [4, 5, 7, 8],
     7: [5, 6, 8, 9],
     8: [6, 7, 9],
-    9: [6, 7, 8],
+    9: [6, 7, 8]
   };
 
   // Apply rules based on the digit
