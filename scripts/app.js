@@ -3,6 +3,7 @@ let valueUpdated = false;
 function generateRandom() {
   valueUpdated = false;
   clearResultColor(); // Clear color before generating new values
+  clearButtonClasses(); // Clear result buttons colors
 
   // Get selected checkboxes for arithmetics
   const arithmeticsCheckboxes = document.querySelectorAll('#arithmeticDropdown input[type="checkbox"]:checked');
@@ -22,7 +23,18 @@ function generateRandom() {
   document.getElementById('number1').value = number1;
   document.getElementById('number2').value = number2;
   document.getElementById('operation').value = operation;
-  document.getElementById('exercise').value = + number1 + ' ' + convertToSymbol(operation) + ' ' + number2 + ' = ?' ;
+  document.getElementById('exercise').value = + number1 + ' ' + convertToSymbol(operation) + ' ' + number2 + ' = ?';
+
+
+  // Calculate the result using the calculateResult function
+  const result = calculateResult(number1, number2, operation);
+
+  // Generate three additional options based on the result
+  const options = generateOptions(result);
+
+  // Set the buttons' text with the numbers in a randomized order
+  setButtonOptions(options);
+
   // Focus on the "Result" input field
   document.getElementById('result').focus();
 }
@@ -51,35 +63,15 @@ function checkResult() {
   if (result === calculatedResult) {
     resultInput.style.backgroundColor = 'lightgreen';  // Assuming the result is correct, trigger confetti
 
-    var confetties = ['confetti', 'stars', 'hearts'];
-    var randomIndex = Math.floor(Math.random() * confetties.length);
-    var selectedVersion = confetties[randomIndex];
-    resultInput.style.backgroundColor = 'lightgreen';  // Assuming the result is correct, trigger confetti
-    switch (selectedVersion) {
-      case 'confetti':
-        startConfetti();
-        setTimeout(function () { stopConfetti(); }, 2000)
-        break;
-      case 'stars':
-        startStars();
-        setTimeout(function () { stopStars(); }, 2000)
-        break;
-      case 'hearts':
-        startHearts();
-        setTimeout(function () { stopHearts(); }, 2000)
-        break;
-      default:
-        break;
-    }
     // Update and display the score based on the correctness of the answer
-    if(!valueUpdated) {
+    if (!valueUpdated) {
       updateScore(true);
       valueUpdated = true;
     }
   } else {
     resultInput.style.backgroundColor = '#FFCCCB';
     // Update and display the score based on the correctness of the answer
-    if(!valueUpdated) {
+    if (!valueUpdated) {
       updateScore(false);
       valueUpdated = true;
     }
@@ -110,16 +102,104 @@ function calculateResult(number1, number2, operation) {
   return calculatedResult;
 }
 
-function triggerConfetti() {
-  // Configure confetti options
-  const confettiConfig = {
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 },
+function generateOptions(number) {
+  // Extract digits from the number
+  const digits = Array.from(number.toString()).map(Number);
+
+  // Initialize options with the original number
+  const options = [];
+
+  // Generate options by applying +-1 and +-2 to each digit
+  digits.forEach((digit, index) => {
+    // Generate options for the current digit
+    const digitOptions = generateDigitOptions(digit, index === 0);
+
+    // Create new options by replacing the current digit
+    const newOptions = digitOptions.map(newDigit => {
+      const newDigits = [...digits];
+      newDigits[index] = newDigit;
+      return parseInt(newDigits.join(''), 10);
+    });
+
+    // Add new options to the overall options array
+    options.push(...newOptions);
+  });
+
+  // Randomize the options and select three distinct values
+  let shuffledArray = shuffleArray(options).slice(0, 3);
+
+  // Add the correct answer 
+  shuffledArray.push(number);
+  return shuffledArray;
+}
+
+function generateDigitOptions(digit, isFirstDigit) {
+  // Define rules for each digit
+  const rules = {
+    0: [1, 2, 3],
+    1: [0, 2, 3],
+    2: [0, 1, 3, 4],
+    3: [1, 2, 4, 5],
+    4: [2, 3, 5, 6],
+    5: [3, 4, 6, 7],
+    6: [4, 5, 7, 8],
+    7: [5, 6, 8, 9],
+    8: [6, 7, 9],
+    9: [6, 7, 8],
   };
 
+  // Apply rules based on the digit
+  return rules[digit] || [];
+}
+
+function shuffleArray(array) {
+  // Randomize the order of elements in the array (Fisher-Yates algorithm)
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function setButtonOptions(options) {
+  // Shuffle the options for random order
+  const shuffledOptions = shuffleArray(options);
+
+  // Set the buttons' text with the shuffled options
+  const buttons = document.getElementById('resultButtons').getElementsByTagName('button');
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].textContent = shuffledOptions[i];
+  }
+}
+
+function triggerConfetti() {
+  // Configure confetti options
+  // const confettiConfig = {
+  //   particleCount: 100,
+  //   spread: 70,
+  //   origin: { y: 0.6 },
+  // };
+
   // Trigger confetti
-  confetti(confettiConfig);
+  var confetties = ['confetti', 'stars', 'hearts'];
+  var randomIndex = Math.floor(Math.random() * confetties.length);
+  var selectedVersion = confetties[randomIndex];
+  switch (selectedVersion) {
+    case 'confetti':
+      startConfetti();
+      setTimeout(function () { stopConfetti(); }, 2000)
+      break;
+    case 'stars':
+      startStars();
+      setTimeout(function () { stopStars(); }, 2000)
+      break;
+    case 'hearts':
+      startHearts();
+      setTimeout(function () { stopHearts(); }, 2000)
+      break;
+    default:
+      break;
+  }
 }
 
 // Add an event listener for the "Enter" key on the entire document
@@ -221,6 +301,7 @@ function updateScore(correct) {
       highScore = streak;
       setCookie('highScore', highScore, 365);
     }
+    setTimeout(function () { generateRandom(); }, 1000)
   } else {
     // Reset streak for wrong answer
     streak = 0;
@@ -238,7 +319,7 @@ function toggleDropdown() {
   // Close the dropdown if it's already open
   if (dropdown.classList.contains("show")) {
     dropdown.style.display = 'block';
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       if (!event.target.matches('.dropbtn')) {
         dropdown.classList.remove('show');
         dropdown.style.display = 'none';
@@ -253,7 +334,7 @@ function toggleDropdown() {
 }
 
 // Close the dropdown if the user clicks outside of it
-window.onclick = function(event) {
+window.onclick = function (event) {
   if (!event.target.matches('.dropbtn')) {
     var dropdowns = document.getElementsByClassName("dropdown-content");
     for (var i = 0; i < dropdowns.length; i++) {
@@ -267,19 +348,22 @@ window.onclick = function(event) {
 
 // Add the following variables to track the current mode and the correct answer
 let currentMode = 'normal'; // Default mode is 'normal'
-let correctAnswer = 0; // Variable to store the correct answer for American mode
 
-// Add the following function to toggle between modes
 function toggleMode() {
   const modeToggle = document.getElementById('modeToggle');
-  currentMode = modeToggle.value;
-
-  // Hide/show elements based on the selected mode
-  document.getElementById('resultInput').classList.toggle('hidden', currentMode === 'american');
-  document.getElementById('resultButtons').classList.toggle('hidden', currentMode !== 'american');
-
-  document.getElementById('resultInput').classList.toggle('show', currentMode === 'normal');
-  document.getElementById('resultButtons').classList.toggle('show', currentMode !== 'normal');
+  const modeLabel = document.getElementById('modeLabel');
+  
+  if (modeToggle.checked) {
+    currentMode = 'american';
+    document.getElementById('resultInput').classList.toggle('hidden', true);
+    document.getElementById('resultButtons').classList.toggle('hidden', false);
+    document.getElementById('resultButtons').classList.toggle('show', true);
+  } else {
+    currentMode = 'normal';
+    document.getElementById('resultInput').classList.toggle('hidden', false);
+    document.getElementById('resultButtons').classList.toggle('hidden', true);
+    document.getElementById('resultButtons').classList.toggle('show', false);
+  }
 
   // Generate a new question when toggling modes
   generateRandom();
@@ -287,8 +371,13 @@ function toggleMode() {
 
 // Add the following function to check the answer in American mode
 function checkAnswer(userAnswer) {
+  // Get the actual result
+  const correctAnswer = calculateResultFromEmpty();
+
+  // Get the result from the user selected button
+  const userAnswerValue = parseInt(document.getElementsByClassName("resultButton")[userAnswer - 1].innerText)
   // Check if the selected answer is correct
-  const resultIsCorrect = userAnswer === correctAnswer;
+  const resultIsCorrect = userAnswerValue === correctAnswer;
 
   // Update and display the streak based on the correctness of the answer
   updateScore(resultIsCorrect);
@@ -302,6 +391,23 @@ function checkAnswer(userAnswer) {
   updateButtonColors(userAnswer, resultIsCorrect);
 }
 
+function calculateResultFromEmpty() {
+
+  const number1 = parseInt(document.getElementById('number1').value, 10);
+  const number2 = parseInt(document.getElementById('number2').value, 10);
+  const operation = document.getElementById('operation').value;
+
+  return calculateResult(number1, number2, operation);
+}
+
+const number1 = parseInt(document.getElementById('number1').value, 10);
+const number2 = parseInt(document.getElementById('number2').value, 10);
+const operation = document.getElementById('operation').value;
+const resultInput = document.getElementById('result');
+const result = parseInt(resultInput.value, 10);
+
+let calculatedResult = calculateResult(number1, number2, operation);
+
 // Add the following function to update button colors based on correctness
 function updateButtonColors(userAnswer, resultIsCorrect) {
   const buttons = document.getElementById('resultButtons').getElementsByTagName('button');
@@ -314,5 +420,12 @@ function updateButtonColors(userAnswer, resultIsCorrect) {
       // Reset other buttons
       buttons[i].classList.remove('correct', 'incorrect');
     }
+  }
+}
+
+function clearButtonClasses() {
+  const buttons = document.getElementById('resultButtons').getElementsByTagName('button');
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].classList.remove('correct', 'incorrect');
   }
 }
