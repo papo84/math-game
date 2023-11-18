@@ -233,6 +233,7 @@ select:focus {
   margin-left:30%;
   margin-right:30%;
   background-color: rgb(122, 110, 175);
+  direction: initial;
 }
 
 /* Add styles for button colors */
@@ -304,4 +305,13 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* Watermark styles */
+.watermark {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5); /* Adjust the color and opacity as needed */
 }
