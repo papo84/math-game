@@ -30,6 +30,8 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px; /* Add margin to separate from the content below */
   z-index: 1; /* Set a lower z-index than the canvas */
+  margin-right: 10%;
+  margin-left: 10%;
 }
 
 .description p {
@@ -51,23 +53,34 @@ body {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.innerContainer {
   margin-right: 10%;
   margin-left: 10%;
 }
 
+/*.innerContainer {
+  margin-right: 10%;
+  margin-left: 10%;
+}*/
+
 .top-section {
-  display: flex;
+  /*display: flex;*/
+  display: none;
   flex-wrap: wrap;
   gap: 20px;
   margin-bottom: 30px;
 }
 
+#exercise {
+  direction: ltr;
+  text-align: center;
+  padding:5px;
+  margin:5px;
+  width: 60%;
+}
+
 .input-group-input {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-basis: calc(33.333% - 15px); /* Adjust the percentage as needed */
 }
 
@@ -101,7 +114,7 @@ label {
 
 .checkbox-item label {
   order: -1;
-  width: 20%;
+  min-width: 75px;
 }
 
 input,
@@ -119,10 +132,6 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-button:hover {
-  background-color: #45a049;
 }
 
 input[type="text"],
@@ -176,4 +185,123 @@ select:focus {
 #result, #digits {
   width:40%;
   margin:10px;
+}
+
+/* Dropdown container */
+.dropbtn {
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  background-color: #666966; /* Change to your desired green color */
+  color: white; /* Set text color to contrast with the background */
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.dropbtn:hover {
+  background-color: #a1a3a1;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  padding: 10px;
+  background-color: #f9f9f9;
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Add the following styles to hide/show elements based on mode */
+.hidden {
+  display: none;
+}
+
+.show {
+  display: flex;
+}
+
+#resultButtons {
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.resultButton{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left:30%;
+  margin-right:30%;
+  background-color: rgb(122, 110, 175);
+}
+
+/* Add styles for button colors */
+button.correct {
+  background-color: #4CAF50;
+}
+
+button.incorrect {
+  background-color: #FF5733;
+}
+
+/* styles for the mode switch */
+/* Style for the toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2196F3;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
