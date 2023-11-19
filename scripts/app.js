@@ -6,19 +6,56 @@ function generateRandom() {
   clearButtonClasses(); // Clear result buttons colors
 
   // Get selected checkboxes for arithmetics
-  const arithmeticsCheckboxes = document.querySelectorAll('#arithmeticDropdown input[type="checkbox"]:checked');
-  const selectedArithmetics = Array.from(arithmeticsCheckboxes).map(checkbox => checkbox.value);
+  // 1. Randomize operation from arithmetics
+  const operation = getRandomElement(getSelectedArithmetics());
 
   // Return error if no operation selected
-  if (selectedArithmetics.length == 0) {
+  if (!operation) {
     alert('בחר פעולה');
     return;
   }
-  // Get a random arithmetic operation from the selected values
-  const operation = selectedArithmetics[Math.floor(Math.random() * selectedArithmetics.length)];
 
-  const number1 = generateRandomNumber(document.getElementById('digits').value);
-  const number2 = generateRandomNumber(document.getElementById('digits').value);
+  // 2. Randomize Number1 as previously defined
+  let number1 = generateRandomNumber(document.getElementById('digits').value);
+
+  // 3. Generate Number2 based on the selected operation
+  let number2;
+  if (operation === 'חזקה') {
+    // If Power is selected, Number2 is randomized from the values 0, 1, 2, 3
+    number2 = getRandomElement([0, 1, 2, 3]);
+  } else if (operation === 'חילוק') {
+    // If Divide is selected, randomize Number1 as previously
+    // Then, find its factors. If not prime, randomize Number2 from the factors, else, randomize Number1 again until non-prime is selected
+    let isPrime = false;
+
+    while (!isPrime) {
+      number1 = generateRandomNumber(document.getElementById('digits').value); // Randomize Number1 again
+      
+      // Find factors of Number1
+      const factors = findFactors(number1);
+      
+      if (factors.length > 2) {
+        // Remove 1 and number1 from factors when number1 is greater than 100
+        if(number1>100) {
+          const indexToRemove = factors.indexOf(1);
+          if (indexToRemove !== -1) {
+            factors.splice(indexToRemove, 1);
+          }
+      
+          const numberIndexToRemove = factors.indexOf(number1);
+          if (numberIndexToRemove !== -1) {
+            factors.splice(numberIndexToRemove, 1);
+          }
+        }
+        // Number1 is not prime, so randomize Number2 from the factors
+        number2 = getRandomElement(factors);
+        isPrime = true; // Exit the loop
+      }
+    }
+  } else {
+    // For other operations, randomize Number2 as previously defined
+    number2 = generateRandomNumber(document.getElementById('digits').value);
+  }
 
   document.getElementById('number1').value = number1;
   document.getElementById('number2').value = number2;
@@ -39,6 +76,17 @@ function generateRandom() {
   document.getElementById('result').focus();
 }
 
+// Helper function to get a random element from an array
+function getRandomElement(array) {
+  const randomIndex = Math.floor(Math.random() * array.length);
+  return array[randomIndex];
+}
+
+function getSelectedArithmetics() {
+  const arithmeticsCheckboxes = document.querySelectorAll('#arithmeticDropdown input[type="checkbox"]:checked');
+  return Array.from(arithmeticsCheckboxes).map(checkbox => checkbox.value);
+}
+
 function clearResultColor() {
   // Clear the color styling from the result element
   document.getElementById('result').style.backgroundColor = '';
@@ -49,6 +97,17 @@ function generateRandomNumber(digits, operation) {
   const min = Math.pow(10, digits - 1);
   const max = Math.pow(10, digits) - 1;
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Helper function to find factors of a number
+function findFactors(number) {
+  const factors = [];
+  for (let i = 1; i <= number; i++) {
+    if (number % i === 0) {
+      factors.push(i);
+    }
+  }
+  return factors;
 }
 
 function checkResult() {
@@ -130,7 +189,7 @@ function generateOptions(number) {
   let shuffledArray = shuffleArray(options).slice(0, 3);
 
   // If original number was negative, turn all to negative
-  if(negativeNumber) shuffledArray = shuffledArray.map(number => { return 0-number; });
+  if (negativeNumber) shuffledArray = shuffledArray.map(number => { return 0 - number; });
 
   // Add the correct answer 
   shuffledArray.push(number);
@@ -324,7 +383,7 @@ function toggleDropdown() {
   if (dropdown.classList.contains("show")) {
     dropdown.style.display = 'block';
     window.onclick = function (event) {
-      if (!event.target.matches('.dropbtn')) {
+      if (!event.target.matches('.dropbtn') && !event.target.matches('.dropbtnCheckbox')) {
         dropdown.classList.remove('show');
         dropdown.style.display = 'none';
       }
@@ -356,7 +415,7 @@ let currentMode = 'normal'; // Default mode is 'normal'
 function toggleMode() {
   const modeToggle = document.getElementById('modeToggle');
   const modeLabel = document.getElementById('modeLabel');
-  
+
   if (modeToggle.checked) {
     currentMode = 'american';
     document.getElementById('resultInput').classList.toggle('hidden', true);
