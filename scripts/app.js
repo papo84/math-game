@@ -127,6 +127,8 @@ function checkResult() {
       updateScore(true);
       valueUpdated = true;
     }
+    // Trigger confetti for correct answer
+    triggerConfetti();
   } else {
     resultInput.style.backgroundColor = '#FFCCCB';
     // Update and display the score based on the correctness of the answer
