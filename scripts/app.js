@@ -17,6 +17,9 @@ function generateRandom() {
 
   // 2. Randomize Number1 as previously defined
   let number1 = generateRandomNumber(document.getElementById('digits').value);
+  if (operation === 'כפל' && document.getElementById('digits').value == 1) {
+    number1 = 2;
+  }
 
   // 3. Generate Number2 based on the selected operation
   let number2;
