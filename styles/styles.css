@@ -322,3 +322,41 @@ input:checked + .slider:before {
 #dropdown div {
   margin: 5px 0;
 }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.dropdown-menu div {
+  margin: 5px 0;
+}
+
+.dropdown-menu input {
+  margin-right: 5px;
+}
+
+/* Show the dropdown menu when the parent is active */
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
