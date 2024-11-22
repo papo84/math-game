@@ -419,8 +419,29 @@ function updateScore(correct) {
   highScoreElement.textContent = `שיא: ${highScore}`;
 }
 
-function toggleDropdown() {
+function toggleDropdownArithmeticDropdown() {
   var dropdown = document.getElementById("arithmeticDropdown");
+  dropdown.classList.toggle("show");
+
+  // Close the dropdown if it's already open
+  if (dropdown.classList.contains("show")) {
+    dropdown.style.display = 'block';
+    window.onclick = function (event) {
+      if (!event.target.matches('.dropbtn') && !event.target.matches('.dropbtnCheckbox')) {
+        dropdown.classList.remove('show');
+        dropdown.style.display = 'none';
+      }
+    };
+  } else {
+    // Revert to the default behavior if the dropdown is closed
+    window.onclick = null;
+    dropdown.classList.remove('show');
+    dropdown.style.display = 'none';
+  }
+}
+
+function toggleDropdownDigitsDropdown() {
+  var dropdown = document.getElementById("digitsDropdown");
   dropdown.classList.toggle("show");
 
   // Close the dropdown if it's already open
@@ -452,6 +473,21 @@ window.onclick = function (event) {
     }
   }
 }
+
+const dropdownButton = document.querySelector(".dropdown-button");
+const dropdownMenu = document.getElementById("dropdown-menu");
+
+dropdownButton.addEventListener("click", () => {
+  dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+});
+
+// Close the dropdown when clicking outside
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".dropdown")) {
+    dropdownMenu.style.display = "none";
+  }
+});
+
 
 // Add the following variables to track the current mode and the correct answer
 let currentMode = 'normal'; // Default mode is 'normal'
