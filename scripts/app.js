@@ -17,8 +17,22 @@ function generateRandom() {
 
   // 2. Randomize Number1 as previously defined
   let number1 = generateRandomNumber(document.getElementById('digits').value);
-  if (operation === 'כפל' && document.getElementById('digits').value == 1) {
-    number1 = 5;
+  if ((operation === 'כפל' || operation === 'חיבור') && document.getElementById('digits').value == 1) {
+    // Example logic update
+    const digits = document.getElementById("digits").value;
+    if (digits === "1") {
+      const selectedValues = [];
+      document.querySelectorAll("#dropdown input[type=checkbox]:checked").forEach(checkbox => {
+        selectedValues.push(parseInt(checkbox.value));
+      });
+
+      // If no values are selected, assume all are selected
+      const valuesToUse = selectedValues.length ? selectedValues : [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+      // Randomize a value from the selected or default values
+      const randomValue = valuesToUse[Math.floor(Math.random() * valuesToUse.length)];
+    }
+    number1 = randomValue;
   }
 
   // 3. Generate Number2 based on the selected operation
@@ -304,7 +318,32 @@ document.addEventListener('DOMContentLoaded', function () {
   let highScore = parseInt(getCookie('highScore')) || 0;
   document.getElementById('highScore').textContent = `שיא: ${highScore}`;
   setCookie('highScore', highScore, 365);
+});document.getElementById("digits").addEventListener("input", function () {
+  const dropdown = document.getElementById("dropdown");
+  if (this.value === "1") {
+    dropdown.style.display = "block";
+  } else {
+    dropdown.style.display = "none";
+    // Uncheck all checkboxes if dropdown is hidden
+    document.querySelectorAll("#dropdown input[type=checkbox]").forEach(checkbox => {
+      checkbox.checked = false;
+    });
+  }
 });
+
+document.getElementById("digits").addEventListener("input", function () {
+  const dropdown = document.getElementById("dropdown");
+  if (this.value === "1") {
+    dropdown.style.display = "block";
+  } else {
+    dropdown.style.display = "none";
+    // Uncheck all checkboxes if dropdown is hidden
+    document.querySelectorAll("#dropdown input[type=checkbox]").forEach(checkbox => {
+      checkbox.checked = false;
+    });
+  }
+});
+
 
 function enforceValidDigits(inputElement) {
   let enteredDigits = parseInt(inputElement.value, 10);

@@ -315,3 +315,10 @@ input:checked + .slider:before {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.5); /* Adjust the color and opacity as needed */
 }
+
+#dropdown {
+  margin-top: 10px;
+}
+#dropdown div {
+  margin: 5px 0;
+}
