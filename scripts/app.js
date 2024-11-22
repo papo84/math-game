@@ -22,7 +22,7 @@ function generateRandom() {
     const digits = document.getElementById("digits").value;
     if (digits === "1") {
       const selectedValues = [];
-      document.querySelectorAll("#dropdown input[type=checkbox]:checked").forEach(checkbox => {
+      document.querySelectorAll("#dropdown-container input[type=checkbox]:checked").forEach(checkbox => {
         selectedValues.push(parseInt(checkbox.value));
       });
 
@@ -441,14 +441,14 @@ function toggleDropdownArithmeticDropdown() {
 }
 
 function toggleDropdownDigitsDropdown() {
-  var dropdown = document.getElementById("digitsDropdown");
+  var dropdown = document.getElementById("dropdown-container");
   dropdown.classList.toggle("show");
 
   // Close the dropdown if it's already open
   if (dropdown.classList.contains("show")) {
     dropdown.style.display = 'block';
     window.onclick = function (event) {
-      if (!event.target.matches('.dropbtn') && !event.target.matches('.dropbtnCheckbox')) {
+      if (!event.target.matches('.dropdown-button') && !event.target.matches('.dropbtnCheckbox')) {
         dropdown.classList.remove('show');
         dropdown.style.display = 'none';
       }
