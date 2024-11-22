@@ -31,8 +31,8 @@ function generateRandom() {
 
       // Randomize a value from the selected or default values
       const randomValue = valuesToUse[Math.floor(Math.random() * valuesToUse.length)];
+      number1 = randomValue;
     }
-    number1 = randomValue;
   }
 
   // 3. Generate Number2 based on the selected operation
