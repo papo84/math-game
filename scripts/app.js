@@ -441,7 +441,7 @@ function toggleDropdownArithmeticDropdown() {
 }
 
 function toggleDropdownDigitsDropdown() {
-  var dropdown = document.getElementById("dropdown-container");
+  var dropdown = document.getElementById("digitsDropdown");
   dropdown.classList.toggle("show");
 
   // Close the dropdown if it's already open
