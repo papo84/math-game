@@ -318,17 +318,6 @@ document.addEventListener('DOMContentLoaded', function () {
   let highScore = parseInt(getCookie('highScore')) || 0;
   document.getElementById('highScore').textContent = `שיא: ${highScore}`;
   setCookie('highScore', highScore, 365);
-});document.getElementById("digits").addEventListener("input", function () {
-  const dropdown = document.getElementById("dropdown");
-  if (this.value === "1") {
-    dropdown.style.display = "block";
-  } else {
-    dropdown.style.display = "none";
-    // Uncheck all checkboxes if dropdown is hidden
-    document.querySelectorAll("#dropdown input[type=checkbox]").forEach(checkbox => {
-      checkbox.checked = false;
-    });
-  }
 });
 
 document.getElementById("digits").addEventListener("input", function () {
@@ -343,7 +332,6 @@ document.getElementById("digits").addEventListener("input", function () {
     });
   }
 });
-
 
 function enforceValidDigits(inputElement) {
   let enteredDigits = parseInt(inputElement.value, 10);
@@ -473,21 +461,6 @@ window.onclick = function (event) {
     }
   }
 }
-
-const dropdownButton = document.querySelector(".dropdown-digit-button");
-const dropdownMenu = document.getElementById("dropdown-menu");
-
-dropdownButton.addEventListener("click", () => {
-  dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
-});
-
-// Close the dropdown when clicking outside
-document.addEventListener("click", (event) => {
-  if (!event.target.closest(".dropdown")) {
-    dropdownMenu.style.display = "none";
-  }
-});
-
 
 // Add the following variables to track the current mode and the correct answer
 let currentMode = 'normal'; // Default mode is 'normal'
