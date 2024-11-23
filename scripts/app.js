@@ -448,7 +448,7 @@ function toggleDropdownDigitsDropdown() {
   if (dropdown.classList.contains("show")) {
     dropdown.style.display = 'block';
     window.onclick = function (event) {
-      if (!event.target.matches('.dropdown-button') && !event.target.matches('.dropbtnCheckbox')) {
+      if (!event.target.matches('.dropdown-digit-button') && !event.target.matches('.dropbtnCheckbox')) {
         dropdown.classList.remove('show');
         dropdown.style.display = 'none';
       }
