@@ -474,7 +474,7 @@ window.onclick = function (event) {
   }
 }
 
-const dropdownButton = document.querySelector(".dropdown-button");
+const dropdownButton = document.querySelector(".dropdown-digit-button");
 const dropdownMenu = document.getElementById("dropdown-menu");
 
 dropdownButton.addEventListener("click", () => {
