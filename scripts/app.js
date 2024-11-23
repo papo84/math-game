@@ -321,15 +321,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.getElementById("digits").addEventListener("input", function () {
-  const dropdown = document.getElementById("dropdown");
+  const dropdown = document.getElementById("dropdown-container");
   if (this.value === "1") {
     dropdown.style.display = "block";
   } else {
     dropdown.style.display = "none";
-    // Uncheck all checkboxes if dropdown is hidden
-    document.querySelectorAll("#dropdown input[type=checkbox]").forEach(checkbox => {
-      checkbox.checked = false;
-    });
   }
 });
 
