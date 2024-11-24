@@ -222,7 +222,7 @@ select:focus {
   display: flex;
 }
 
-.modeLabel {
+#modeLabel {
   vertical-align: -webkit-baseline-middle;
 }
 
