@@ -198,7 +198,7 @@ select:focus {
   margin-top: 10px;
 }
 
-.dropbtn:hover, .dropdown-digit-button {
+.dropbtn:hover, .dropdown-digit-button:hover {
   background-color: #a1a3a1;
 }
 
