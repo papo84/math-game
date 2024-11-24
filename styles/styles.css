@@ -222,6 +222,10 @@ select:focus {
   display: flex;
 }
 
+.modeLabel {
+  vertical-align: -webkit-baseline-middle;
+}
+
 #resultButtons {
   flex-direction: column;
   justify-content: space-around;
