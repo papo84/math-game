@@ -69,6 +69,30 @@ function generateRandom() {
         isPrime = true; // Exit the loop
       }
     }
+  } else if (operation === 'חיסור') {
+    // For subtraction, check the options
+    const option1 = document.getElementById('option1').checked;
+    const option2 = document.getElementById('option2').checked;
+    
+    if (option1 && option2) {
+      // Both options selected: number2 is 1-10 and can be any value
+      number2 = Math.floor(Math.random() * 10) + 1;
+    } else if (option1) {
+      // Only option1 selected: number2 is 1-10 and must be <= number1
+      number2 = Math.floor(Math.random() * 10) + 1;
+      if (number2 > number1) {
+        number2 = Math.floor(Math.random() * number1) + 1;
+      }
+    } else if (option2) {
+      // Only option2 selected: number2 can be any value
+      number2 = generateRandomNumber(document.getElementById('digits').value);
+    } else {
+      // Neither option selected: number2 must be <= number1
+      number2 = generateRandomNumber(document.getElementById('digits').value);
+      if (number2 > number1) {
+        number2 = Math.floor(Math.random() * number1) + 1;
+      }
+    }
   } else {
     // For other operations, randomize Number2 as previously defined
     number2 = generateRandomNumber(document.getElementById('digits').value);
@@ -302,6 +326,16 @@ document.addEventListener('keydown', function (event) {
 
 document.addEventListener('DOMContentLoaded', function () {
   const digitsInput = document.getElementById('digits');
+  const subtractCheckbox = document.getElementById('subtractCheckbox');
+  const toggleContainer = document.querySelector('.checkbox-container');
+
+  // Initial check for subtract checkbox
+  toggleContainer.classList.toggle('hidden', !subtractCheckbox.checked);
+
+  // Add event listener for subtract checkbox
+  subtractCheckbox.addEventListener('change', function() {
+    toggleContainer.classList.toggle('hidden', !this.checked);
+  });
 
   // Add an input event listener to the digits input field
   digitsInput.addEventListener('input', function () {
@@ -541,3 +575,12 @@ function clearButtonClasses() {
     buttons[i].classList.remove('correct', 'incorrect');
   }
 }
+
+document.getElementById('subtractCheckbox').addEventListener('change', function() {
+  const toggleContainer = document.querySelector('.checkbox-container');
+  if (this.checked) {
+    toggleContainer.classList.remove('hidden');
+  } else {
+    toggleContainer.classList.add('hidden');
+  }
+});
