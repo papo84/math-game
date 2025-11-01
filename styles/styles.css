@@ -382,9 +382,19 @@ input:checked + .slider:before {
   margin-left: 10px;
 }
 
-.checkbox-container {
+.subtract-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin-top: 10px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.subtract-label {
+  font-weight: 700;
+  font-size: 16px;
+  color: #2c3e50;
+  margin-bottom: 8px; /* space before first toggle */
 }

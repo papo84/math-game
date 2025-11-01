@@ -50,7 +50,7 @@ function generateRandom() {
       
       // Find factors of Number1
       const factors = findFactors(number1);
-      
+      const digits = document.getElementById("digits").value;
       if (factors.length > 2) {
         // Remove 1 and number1 from factors when number1 is greater than 100
         if(number1>100) {
@@ -63,6 +63,21 @@ function generateRandom() {
           if (numberIndexToRemove !== -1) {
             factors.splice(numberIndexToRemove, 1);
           }
+        }
+        else if(digits === "2") {
+          const selectedValues = [];
+          document.querySelectorAll("#dropdown-container input[type=checkbox]:checked").forEach(checkbox => {
+            selectedValues.push(parseInt(checkbox.value));
+          });
+    
+          // If no values are selected, assume all are selected
+          const valuesToUse = selectedValues.length ? selectedValues : [1, 2, 3, 4, 5, 6, 7, 8, 9];
+          const allowed = factors.filter(f => valuesToUse.includes(f));
+          if (allowed.length === 0) {
+            continue;
+          }
+          // restrict factors in-place so the selection below uses only allowed divisors
+          factors.splice(0, factors.length, ...allowed);
         }
         // Number1 is not prime, so randomize Number2 from the factors
         number2 = getRandomElement(factors);
@@ -327,7 +342,7 @@ document.addEventListener('keydown', function (event) {
 document.addEventListener('DOMContentLoaded', function () {
   const digitsInput = document.getElementById('digits');
   const subtractCheckbox = document.getElementById('subtractCheckbox');
-  const toggleContainer = document.querySelector('.checkbox-container');
+  const toggleContainer = document.querySelector('.subtract-container');
 
   // Initial check for subtract checkbox
   toggleContainer.classList.toggle('hidden', !subtractCheckbox.checked);
@@ -337,10 +352,25 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleContainer.classList.toggle('hidden', !this.checked);
   });
 
-  // Add an input event listener to the digits input field
-  digitsInput.addEventListener('input', function () {
-    enforceValidDigits(digitsInput);
+  // Validate digits only when focus leaves the field (allow empty while editing)
+  digitsInput.addEventListener('blur', function () {
+    validateDigitsOnBlur(digitsInput);
   });
+
+  // While typing, keep updating visibility (but don't coerce value)
+  digitsInput.addEventListener('input', function () {
+    updateDigitsDropdownVisibility();
+  });
+
+  // Update visibility when arithmetic choices change
+  ['addCheckbox','multiplyCheckbox','subtractCheckbox','divideCheckbox','powerCheckbox']
+    .forEach(function(id){
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', updateDigitsDropdownVisibility);
+    });
+
+  // Initialize visibility on load
+  updateDigitsDropdownVisibility();
   const resultInput = document.getElementById('result');
 
   // Add an input event listener to the result input field
@@ -354,14 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setCookie('highScore', highScore, 365);
 });
 
-document.getElementById("digits").addEventListener("input", function () {
-  const dropdown = document.getElementById("dropdown-container");
-  if (this.value === "1") {
-    dropdown.style.display = "block";
-  } else {
-    dropdown.style.display = "none";
-  }
-});
+// (moved to DOMContentLoaded with richer logic via updateDigitsDropdownVisibility)
 
 function enforceValidDigits(inputElement) {
   let enteredDigits = parseInt(inputElement.value, 10);
@@ -375,6 +398,47 @@ function enforceValidDigits(inputElement) {
 
   // Update the input field value
   inputElement.value = enteredDigits;
+}
+
+// Validate digits on blur: allow empty while editing; on blur, set default 2 or clamp 1-5
+function validateDigitsOnBlur(inputElement) {
+  const raw = (inputElement.value || '').trim();
+  let finalValue;
+
+  if (raw === '') {
+    finalValue = 2; // default when left empty
+  } else {
+    let parsed = parseInt(raw, 10);
+    if (isNaN(parsed)) {
+      parsed = 2;
+    }
+    if (parsed < 1) parsed = 1;
+    if (parsed > 5) parsed = 5;
+    finalValue = parsed;
+  }
+
+  inputElement.value = finalValue;
+  updateDigitsDropdownVisibility();
+}
+
+// Determine whether to show the digits dropdown based on selected arithmetics and digits value
+function updateDigitsDropdownVisibility() {
+  const container = document.getElementById('dropdown-container');
+  if (!container) return;
+
+  const digitsVal = parseInt(document.getElementById('digits').value, 10);
+
+  const add = !!document.getElementById('addCheckbox')?.checked;
+  const multiply = !!document.getElementById('multiplyCheckbox')?.checked;
+  const subtract = !!document.getElementById('subtractCheckbox')?.checked;
+  const divide = !!document.getElementById('divideCheckbox')?.checked;
+  const power = !!document.getElementById('powerCheckbox')?.checked;
+
+  const onlyAddOrMultiply = (add || multiply) && !subtract && !divide && !power;
+  const onlyDivide = divide && !add && !multiply && !subtract && !power;
+
+  const shouldShow = (digitsVal === 1 && onlyAddOrMultiply) || (digitsVal === 2 && onlyDivide);
+  container.style.display = shouldShow ? 'block' : 'none';
 }
 
 function convertToSymbol(operationName) {
@@ -577,7 +641,7 @@ function clearButtonClasses() {
 }
 
 document.getElementById('subtractCheckbox').addEventListener('change', function() {
-  const toggleContainer = document.querySelector('.checkbox-container');
+  const toggleContainer = document.querySelector('.subtract-container');
   if (this.checked) {
     toggleContainer.classList.remove('hidden');
   } else {
