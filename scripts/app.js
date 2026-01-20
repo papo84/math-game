@@ -172,10 +172,19 @@ function generateTestQuestion() {
         valid = true;
       }
     }
-  } else {
-    // sum/subtract: first up to 2 digits (1..99), second single digit (1..9)
+  } else if (operation === 'חיבור') {
+    // addition: first up to 2 digits (1..99), second single digit (1..9), result must be <= 99
+    let maxN2 = 0;
+    do {
+      number1 = Math.floor(Math.random() * 99) + 1;
+      maxN2 = Math.min(9, 99 - number1);
+    } while (maxN2 < 1);
+    number2 = Math.floor(Math.random() * maxN2) + 1;
+  } else { // 'חיסור'
+    // subtraction: first up to 2 digits (1..99), second single digit (1..9), result must be non-negative
     number1 = Math.floor(Math.random() * 99) + 1;
-    number2 = Math.floor(Math.random() * 9) + 1;
+    const maxN2 = Math.min(9, number1);
+    number2 = Math.floor(Math.random() * maxN2) + 1;
   }
 
   document.getElementById('number1').value = number1;
