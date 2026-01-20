@@ -1,4 +1,10 @@
 let valueUpdated = false;
+let testMode = false;
+let testTimerId = null;
+let testEndTimestamp = null;
+let testAskedCount = 0;
+let testCorrectCount = 0;
+let testResults = [];
 
 function generateRandom() {
   valueUpdated = false;
@@ -132,6 +138,53 @@ function generateRandom() {
   document.getElementById('result').focus();
 }
 
+function generateTestQuestion() {
+  // Force normal input mode UI during test
+  const modeToggleContainer = document.querySelector('.mode-toggle');
+  if (modeToggleContainer) modeToggleContainer.classList.add('hidden');
+  document.getElementById('resultInput').classList.toggle('hidden', false);
+  document.getElementById('resultButtons').classList.toggle('hidden', true);
+  document.getElementById('resultButtons').classList.toggle('show', false);
+
+  clearResultColor();
+  clearButtonClasses();
+
+  // Randomly choose operation: +, -, *, :
+  const operations = ['חיבור', 'חיסור', 'כפל', 'חילוק'];
+  const operation = getRandomElement(operations);
+
+  let number1, number2;
+  if (operation === 'כפל') {
+    // multiply: both single digit (1..9)
+    number1 = Math.floor(Math.random() * 9) + 1;
+    number2 = Math.floor(Math.random() * 9) + 1;
+  } else if (operation === 'חילוק') {
+    // division: first up to 2 digits (<=99), second single digit, result single digit
+    // choose divisor (1..9) and quotient (1..9), ensure product <= 99
+    let valid = false;
+    while (!valid) {
+      const divisor = Math.floor(Math.random() * 9) + 1;
+      const quotient = Math.floor(Math.random() * 9) + 1;
+      const product = divisor * quotient;
+      if (product <= 99) {
+        number1 = product;
+        number2 = divisor;
+        valid = true;
+      }
+    }
+  } else {
+    // sum/subtract: first up to 2 digits (1..99), second single digit (1..9)
+    number1 = Math.floor(Math.random() * 99) + 1;
+    number2 = Math.floor(Math.random() * 9) + 1;
+  }
+
+  document.getElementById('number1').value = number1;
+  document.getElementById('number2').value = number2;
+  document.getElementById('operation').value = operation;
+  document.getElementById('exercise').value = + number1 + ' ' + convertToSymbol(operation) + ' ' + number2 + ' = ?';
+  document.getElementById('result').focus();
+}
+
 // Helper function to get a random element from an array
 function getRandomElement(array) {
   const randomIndex = Math.floor(Math.random() * array.length);
@@ -174,6 +227,12 @@ function checkResult() {
   const result = parseInt(resultInput.value, 10);
 
   let calculatedResult = calculateResult(number1, number2, operation);
+
+  if (testMode) {
+    const correct = result === calculatedResult;
+    handleTestAnswer(correct, { number1, number2, operation, userAnswer: result, correctAnswer: calculatedResult });
+    return;
+  }
 
   if (result === calculatedResult) {
     resultInput.style.backgroundColor = 'lightgreen';  // Assuming the result is correct, trigger confetti
@@ -589,6 +648,17 @@ function checkAnswer(userAnswer) {
   // Check if the selected answer is correct
   const resultIsCorrect = userAnswerValue === correctAnswer;
 
+  if (testMode) {
+    handleTestAnswer(resultIsCorrect, {
+      number1: parseInt(document.getElementById('number1').value, 10),
+      number2: parseInt(document.getElementById('number2').value, 10),
+      operation: document.getElementById('operation').value,
+      userAnswer: userAnswerValue,
+      correctAnswer: correctAnswer
+    });
+    return;
+  }
+
   // Update and display the streak based on the correctness of the answer
   updateScore(resultIsCorrect);
 
@@ -601,6 +671,193 @@ function checkAnswer(userAnswer) {
   updateButtonColors(userAnswer, resultIsCorrect);
 }
 
+function handleTestAnswer(isCorrect, details) {
+  // Update counters
+  testAskedCount++;
+  if (isCorrect) testCorrectCount++;
+
+  // Append to summary list
+  appendTestSummary(details.number1, details.number2, details.operation, details.userAnswer, details.correctAnswer, isCorrect);
+
+  // Update UI counters
+  const progressEl = document.getElementById('testProgress');
+  const correctEl = document.getElementById('testCorrect');
+  if (progressEl) progressEl.textContent = `${testAskedCount}/100`;
+  if (correctEl) correctEl.textContent = `נכונות: ${testCorrectCount}`;
+
+  // Check end condition
+  if (testAskedCount >= 100) {
+    endTestMode();
+    return;
+  }
+
+  // Next question instantly
+  document.getElementById('result').value = '';
+  generateTestQuestion();
+}
+
+function appendTestSummary(n1, n2, opName, userAnswer, correctAnswer, isCorrect) {
+  const summary = document.getElementById('testSummary');
+  if (!summary) return;
+  summary.classList.remove('hidden');
+
+  const item = document.createElement('div');
+  item.className = `test-item ${isCorrect ? 'correct' : 'wrong'}`;
+  const op = convertToSymbol(opName);
+  item.textContent = `${n1} ${op} ${n2} = ${correctAnswer} | תשובתך: ${userAnswer}`;
+  summary.appendChild(item);
+
+  // Save for download
+  testResults.push({ n1, n2, op: opName, correctAnswer, userAnswer, isCorrect });
+}
+
+function startTestMode() {
+  if (testMode) return;
+  testMode = true;
+  testAskedCount = 0;
+  testCorrectCount = 0;
+  testResults = [];
+
+  // Hide mode toggle
+  const modeToggleContainer = document.querySelector('.mode-toggle');
+  if (modeToggleContainer) modeToggleContainer.classList.add('hidden');
+
+  // Show/Hide controls
+  const startBtn = document.getElementById('startTest');
+  const endBtn = document.getElementById('endTest');
+  const downloadBtn = document.getElementById('downloadResults');
+  const summary = document.getElementById('testSummary');
+  const progressEl = document.getElementById('testProgress');
+  const correctEl = document.getElementById('testCorrect');
+  const timerEl = document.getElementById('testTimer');
+  if (startBtn) startBtn.classList.add('hidden');
+  if (endBtn) endBtn.classList.remove('hidden');
+  if (downloadBtn) downloadBtn.classList.add('hidden');
+  if (summary) { summary.classList.add('hidden'); summary.innerHTML = ''; }
+  if (progressEl) progressEl.textContent = `0/100`;
+  if (correctEl) correctEl.textContent = `נכונות: 0`;
+  if (timerEl) timerEl.textContent = `10:00`;
+
+  // Start timer (10 minutes)
+  const now = Date.now();
+  testEndTimestamp = now + 10 * 60 * 1000;
+  if (testTimerId) clearInterval(testTimerId);
+  testTimerId = setInterval(updateTestTimer, 250);
+
+  // Generate first question
+  generateTestQuestion();
+}
+
+function updateTestTimer() {
+  const remainingMs = Math.max(0, testEndTimestamp - Date.now());
+  const totalSeconds = Math.floor(remainingMs / 1000);
+  const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const ss = String(totalSeconds % 60).padStart(2, '0');
+  const timerEl = document.getElementById('testTimer');
+  if (timerEl) timerEl.textContent = `${mm}:${ss}`;
+
+  if (remainingMs <= 0) {
+    endTestMode();
+  }
+}
+
+function endTestMode() {
+  if (!testMode) return;
+  testMode = false;
+  if (testTimerId) {
+    clearInterval(testTimerId);
+    testTimerId = null;
+  }
+
+  // Show score
+  const score = testCorrectCount;
+  showTestModal(score);
+  if (score === 100) {
+    triggerConfetti();
+  }
+
+  // Restore controls
+  const startBtn = document.getElementById('startTest');
+  const endBtn = document.getElementById('endTest');
+  const downloadBtn = document.getElementById('downloadResults');
+  const clearBtn = document.getElementById('clearTest');
+  if (startBtn) startBtn.classList.remove('hidden');
+  if (endBtn) endBtn.classList.add('hidden');
+  if (downloadBtn) downloadBtn.classList.remove('hidden');
+  if (clearBtn) clearBtn.classList.remove('hidden');
+
+  // Show mode toggle again
+  const modeToggleContainer = document.querySelector('.mode-toggle');
+  if (modeToggleContainer) modeToggleContainer.classList.remove('hidden');
+}
+
+function downloadTestResults() {
+  if (!testResults.length) return;
+  // CSV export
+  const header = ['number1','operation','number2','correctAnswer','userAnswer','isCorrect'];
+  const rows = testResults.map(r => [r.n1, convertToSymbol(r.op), r.n2, r.correctAnswer, r.userAnswer, r.isCorrect ? 'true' : 'false']);
+  const lines = [header.join(','), ...rows.map(arr => arr.join(','))];
+  // Prepend BOM for Excel and use CRLF line endings
+  const csv = '\\ufeff' + lines.join('\\r\\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'test-results.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function showTestModal(score) {
+  const modal = document.getElementById('testModal');
+  const body = document.getElementById('testModalBody');
+  if (!modal || !body) return;
+  body.textContent = `הציון שלך: ${score}/100`;
+  modal.classList.remove('hidden');
+}
+
+function hideTestModal() {
+  const modal = document.getElementById('testModal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+}
+
+function clearTestResults() {
+  // Reset state
+  testAskedCount = 0;
+  testCorrectCount = 0;
+  testResults = [];
+  if (testTimerId) {
+    clearInterval(testTimerId);
+    testTimerId = null;
+  }
+  testMode = false;
+
+  // Reset UI
+  const progressEl = document.getElementById('testProgress');
+  const correctEl = document.getElementById('testCorrect');
+  const timerEl = document.getElementById('testTimer');
+  const summary = document.getElementById('testSummary');
+  const startBtn = document.getElementById('startTest');
+  const endBtn = document.getElementById('endTest');
+  const downloadBtn = document.getElementById('downloadResults');
+  const clearBtn = document.getElementById('clearTest');
+  if (progressEl) progressEl.textContent = `0/100`;
+  if (correctEl) correctEl.textContent = `נכונות: 0`;
+  if (timerEl) timerEl.textContent = `10:00`;
+  if (summary) { summary.classList.add('hidden'); summary.innerHTML = ''; }
+  if (startBtn) startBtn.classList.remove('hidden');
+  if (endBtn) endBtn.classList.add('hidden');
+  if (downloadBtn) downloadBtn.classList.add('hidden');
+  if (clearBtn) clearBtn.classList.add('hidden');
+
+  // Show mode toggle
+  const modeToggleContainer = document.querySelector('.mode-toggle');
+  if (modeToggleContainer) modeToggleContainer.classList.remove('hidden');
+  hideTestModal();
+}
 function calculateResultFromEmpty() {
 
   const number1 = parseInt(document.getElementById('number1').value, 10);

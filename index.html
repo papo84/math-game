@@ -172,13 +172,31 @@
               <span class="slider round"></span>
             </label>
             <span id="modeLabel">רגיל</span>
-          </div>          
+            </div>
+            <hr class="divider">
+            <div id="testControls" class="test-controls">
+              <button id="startTest" onclick="startTestMode()">התחל מצב מבחן</button>
+              <button id="endTest" class="hidden" onclick="endTestMode()">סיים מבחן</button>
+              <span id="testTimer" class="test-timer">10:00</span>
+              <span id="testProgress" class="test-progress">0/100</span>
+              <span id="testCorrect" class="test-correct">נכונות: 0</span>
+              <button id="downloadResults" class="hidden" onclick="downloadTestResults()">הורד תוצאות</button>
+              <button id="clearTest" class="hidden" onclick="clearTestResults()">נקה מבחן</button>
+            </div>
+            <div id="testSummary" class="test-summary hidden"></div>          
         </div>  
       </div>
     </div>
   </div>
   <canvas id="confettiCanvas"></canvas>
   <div class="watermark">papo84 & chatGPT</div>
+    <!-- Modal for test score -->
+    <div id="testModal" class="modal hidden">
+      <div class="modal-content">
+        <span id="testModalClose" class="modal-close" onclick="hideTestModal()">&times;</span>
+        <div id="testModalBody" class="modal-body">הציון שלך: 0/100</div>
+      </div>
+    </div>
   <script src="scripts/app.js"></script>
   <script src="scripts/confetti.js"></script>
   <script src="scripts/stars.js"></script>
