@@ -5,6 +5,7 @@ let testEndTimestamp = null;
 let testAskedCount = 0;
 let testCorrectCount = 0;
 let testResults = [];
+let testTargetQuestions = 100;
 
 function generateRandom() {
   valueUpdated = false;
@@ -117,6 +118,55 @@ function generateRandom() {
   } else {
     // For other operations, randomize Number2 as previously defined
     number2 = generateRandomNumber(document.getElementById('digits').value);
+  }
+
+  // If 'עד 10' (option1) is enabled, enforce extra constraints in regular mode
+  const limitToTen = !!document.getElementById('option1')?.checked;
+  if (limitToTen) {
+    if (operation === 'חיבור') {
+      // Ensure sum <= 99 and second operand up to 10
+      let attempts = 0;
+      while ((number1 + number2 > 99 || number2 > 10) && attempts < 100) {
+        const maxAllowed = Math.min(10, 99 - number1);
+        if (maxAllowed < 1) {
+          // regenerate number1 within 1..99 to allow a valid sum
+          number1 = Math.floor(Math.random() * 99) + 1;
+          attempts++;
+          continue;
+        }
+        number2 = Math.floor(Math.random() * maxAllowed) + 1;
+        attempts++;
+      }
+    } else if (operation === 'חיסור') {
+      // Prevent negative results and keep second operand up to 10
+      const maxN2 = Math.min(10, number1);
+      number2 = Math.max(1, Math.min(number2, maxN2));
+    } else if (operation === 'חילוק') {
+      // Keep quotient <= 9; also respect digits dropdown when digits==2
+      let attempts = 0;
+      while (attempts < 100) {
+        const factors = findFactors(number1);
+        // Exclude 0 and avoid division by zero implicitly
+        let allowed = factors.filter(f => f > 0 && (number1 / f) <= 9);
+        const digitsVal = document.getElementById('digits') ? document.getElementById('digits').value : null;
+        if (digitsVal === "2") {
+          const selectedValues = [];
+          document.querySelectorAll("#dropdown-container input[type=checkbox]:checked").forEach(cb => {
+            const v = parseInt(cb.value, 10);
+            if (!isNaN(v)) selectedValues.push(v);
+          });
+          const valuesToUse = selectedValues.length ? selectedValues : [1,2,3,4,5,6,7,8,9];
+          allowed = allowed.filter(f => valuesToUse.includes(f));
+        }
+        if (allowed.length > 0) {
+          number2 = getRandomElement(allowed);
+          break;
+        }
+        // No allowed divisors for current number1: regenerate number1 within 1..99
+        number1 = Math.floor(Math.random() * 99) + 1;
+        attempts++;
+      }
+    }
   }
 
   document.getElementById('number1').value = number1;
@@ -691,11 +741,11 @@ function handleTestAnswer(isCorrect, details) {
   // Update UI counters
   const progressEl = document.getElementById('testProgress');
   const correctEl = document.getElementById('testCorrect');
-  if (progressEl) progressEl.textContent = `${testAskedCount}/100`;
+  if (progressEl) progressEl.textContent = `${testAskedCount}/${testTargetQuestions}`;
   if (correctEl) correctEl.textContent = `נכונות: ${testCorrectCount}`;
 
   // Check end condition
-  if (testAskedCount >= 100) {
+  if (testAskedCount >= testTargetQuestions) {
     endTestMode();
     return;
   }
@@ -726,6 +776,8 @@ function startTestMode() {
   testAskedCount = 0;
   testCorrectCount = 0;
   testResults = [];
+  const countSelect = document.getElementById('testCount');
+  testTargetQuestions = parseInt(countSelect && countSelect.value ? countSelect.value : '100', 10);
 
   // Hide mode toggle
   const modeToggleContainer = document.querySelector('.mode-toggle');
@@ -743,7 +795,7 @@ function startTestMode() {
   if (endBtn) endBtn.classList.remove('hidden');
   if (downloadBtn) downloadBtn.classList.add('hidden');
   if (summary) { summary.classList.add('hidden'); summary.innerHTML = ''; }
-  if (progressEl) progressEl.textContent = `0/100`;
+  if (progressEl) progressEl.textContent = `0/${testTargetQuestions}`;
   if (correctEl) correctEl.textContent = `נכונות: 0`;
   if (timerEl) timerEl.textContent = `10:00`;
 
@@ -781,7 +833,7 @@ function endTestMode() {
   // Show score
   const score = testCorrectCount;
   showTestModal(score);
-  if (score === 100) {
+  if (score === testTargetQuestions) {
     triggerConfetti();
   }
 
@@ -812,18 +864,121 @@ function downloadTestResults() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'test-results.csv';
+  a.download = `test-results-${testTargetQuestions}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
+function getAllowedOperationsFromSettings() {
+  const ops = [];
+  const add = document.getElementById('addCheckbox');
+  const sub = document.getElementById('subtractCheckbox');
+  const mul = document.getElementById('multiplyCheckbox');
+  const div = document.getElementById('divideCheckbox');
+  if (add && add.checked) ops.push('חיבור');
+  if (sub && sub.checked) ops.push('חיסור');
+  if (mul && mul.checked) ops.push('כפל');
+  if (div && div.checked) ops.push('חילוק');
+  return ops.length ? ops : ['חיבור','חיסור','כפל','חילוק'];
+}
+
+function generatePrintableQuestion(ops) {
+  const operation = getRandomElement(ops);
+  let number1, number2;
+  if (operation === 'כפל') {
+    number1 = Math.floor(Math.random() * 9) + 1;
+    number2 = Math.floor(Math.random() * 9) + 1;
+  } else if (operation === 'חילוק') {
+    let valid = false;
+    while (!valid) {
+      const divisor = Math.floor(Math.random() * 9) + 1;
+      const quotient = Math.floor(Math.random() * 9) + 1;
+      const product = divisor * quotient;
+      if (product <= 99) {
+        number1 = product;
+        number2 = divisor;
+        valid = true;
+      }
+    }
+  } else if (operation === 'חיבור') {
+    let maxN2 = 0;
+    do {
+      number1 = Math.floor(Math.random() * 99) + 1;
+      maxN2 = Math.min(9, 99 - number1);
+    } while (maxN2 < 1);
+    number2 = Math.floor(Math.random() * maxN2) + 1;
+  } else { // חיסור
+    number1 = Math.floor(Math.random() * 99) + 1;
+    const maxN2 = Math.min(9, number1);
+    number2 = Math.floor(Math.random() * maxN2) + 1;
+  }
+  return { number1, number2, operation };
+}
+
+function generatePrintableTest() {
+  const countSelect = document.getElementById('testCount');
+  const questionsCount = parseInt(countSelect && countSelect.value ? countSelect.value : '100', 10);
+  const ops = getAllowedOperationsFromSettings();
+  const questions = [];
+  for (let i = 0; i < questionsCount; i++) {
+    questions.push(generatePrintableQuestion(ops));
+  }
+  const w = window.open('', '_blank');
+  if (!w) return;
+  const style = `
+    <style>
+      body { font-family: Arial, sans-serif; direction: rtl; }
+      .sheet { max-width: 800px; margin: 0 auto; padding: 16px; }
+      h2 { text-align: center; }
+      .q-list { list-style: none; padding: 0; margin: 0; columns: 2; -webkit-columns: 2; -moz-columns: 2; }
+      .q-list li { padding: 6px 8px; margin-bottom: 6px; break-inside: avoid; }
+      .eq { direction: ltr; unicode-bidi: bidi-override; display: inline-block; }
+      .meta { display: flex; justify-content: space-between; margin-bottom: 12px; }
+      @media print { .no-print { display: none; } }
+    </style>
+  `;
+  const listItems = questions.map((q) => {
+    const sym = convertToSymbol(q.operation);
+    return `<li><span class="eq">${q.number1} ${sym} ${q.number2} = ______</span></li>`;
+  }).join('');
+  const html = `
+    <!doctype html>
+    <html lang="he">
+      <head>
+        <meta charset="utf-8">
+        ${style}
+        <title>מבחן חשבון (${questionsCount} שאלות)</title>
+      </head>
+      <body>
+        <div class="sheet">
+          <div class="meta">
+            <div>שם: __________</div>
+            <div>תאריך: __________</div>
+          </div>
+          <h2>מבחן חשבון (${questionsCount} שאלות)</h2>
+          <ul class="q-list">
+            ${listItems}
+          </ul>
+          <div class="no-print">
+            <button onclick="window.print()">הדפס</button>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+}
+
 function showTestModal(score) {
   const modal = document.getElementById('testModal');
   const body = document.getElementById('testModalBody');
   if (!modal || !body) return;
-  body.textContent = `הציון שלך: ${score}/100`;
+  body.textContent = `הציון שלך: ${score}/${testTargetQuestions}`;
   modal.classList.remove('hidden');
 }
 
@@ -854,6 +1009,9 @@ function clearTestResults() {
   const downloadBtn = document.getElementById('downloadResults');
   const clearBtn = document.getElementById('clearTest');
   if (progressEl) progressEl.textContent = `0/100`;
+  const countSelect = document.getElementById('testCount');
+  const countVal = parseInt(countSelect && countSelect.value ? countSelect.value : '100', 10);
+  if (progressEl) progressEl.textContent = `0/${countVal}`;
   if (correctEl) correctEl.textContent = `נכונות: 0`;
   if (timerEl) timerEl.textContent = `10:00`;
   if (summary) { summary.classList.add('hidden'); summary.innerHTML = ''; }

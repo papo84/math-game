@@ -175,13 +175,19 @@
             </div>
             <hr class="divider">
             <div id="testControls" class="test-controls">
-              <button id="startTest" onclick="startTestMode()">התחל מצב מבחן</button>
-              <button id="endTest" class="hidden" onclick="endTestMode()">סיים מבחן</button>
+              <button id="startTest" onclick="startTestMode()">מבדק</button>
+              <button id="endTest" class="hidden" onclick="endTestMode()">סיים מבדק</button>
+              <label for="testCount">מספר שאלות</label>
+              <select id="testCount">
+                <option value="100" selected>100</option>
+                <option value="50">50</option>
+              </select>
               <span id="testTimer" class="test-timer">10:00</span>
               <span id="testProgress" class="test-progress">0/100</span>
               <span id="testCorrect" class="test-correct">נכונות: 0</span>
               <button id="downloadResults" class="hidden" onclick="downloadTestResults()">הורד תוצאות</button>
-              <button id="clearTest" class="hidden" onclick="clearTestResults()">נקה מבחן</button>
+              <button id="clearTest" class="hidden" onclick="clearTestResults()">נקה מבדק</button>
+              <button id="printableTest" onclick="generatePrintableTest()">צור מבחן להדפסה</button>
             </div>
             <div id="testSummary" class="test-summary hidden"></div>          
         </div>  
